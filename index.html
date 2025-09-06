@@ -12,14 +12,9 @@
     color: #fff;
     padding: 40px;
   }
-  h1 {
-    font-size: 22px;
-    margin: 15px 0;
-  }
-  p {
-    font-size: 15px;
-    color: #ccc;
-  }
+  h1 { font-size: 22px; margin: 15px 0; }
+  p { font-size: 15px; color: #ccc; }
+
   button {
     background: #2196f3;
     color: #fff;
@@ -38,9 +33,7 @@
     opacity: 1;
     pointer-events: auto;
   }
-  button:hover {
-    background: #1e88e5;
-  }
+  button:hover { background: #1e88e5; }
 
   /* Spinner Styles */
   .spinner {
@@ -55,16 +48,16 @@
     font-size: 18px;
     color: #29b6f6;
   }
-
   .ring {
     position: absolute;
     width: 100%;
     height: 100%;
-    border: 6px solid rgba(255, 255, 255, 0.1);
+    border: 6px solid rgba(255,255,255,0.08);
     border-top: 6px solid #29b6f6;
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
+  .count { position: relative; z-index: 1; }
 
   @keyframes spin {
     0% { transform: rotate(0deg); }
@@ -72,23 +65,31 @@
   }
 </style>
 <script>
-  const nextPage = "https://mita-dabalos92.systeme.io/780a57d2"; // Second landing page
+  const nextPage = "https://mita-dabalos92.systeme.io/780a57d2"; // second landing page
   let countdown = 5;
-  let timer;
+  let timerId = null;
 
   function startCountdown() {
-    const el = document.getElementById("timer");
+    const timerEl = document.getElementById("timer");
     const btn = document.getElementById("openBtn");
 
-    timer = setInterval(() => {
-      countdown--;
-      el.textContent = countdown;
+    // show initial value
+    timerEl.textContent = countdown;
 
-      if (countdown === 0) {
-        clearInterval(timer);
-        document.querySelector(".spinner").style.display = "none"; // Hide spinner
+    timerId = setInterval(() => {
+      countdown--;
+
+      // show 5 -> 1, then stop (do not show 0)
+      if (countdown <= 0) {
+        clearInterval(timerId);
+        // hide spinner and enable button
+        const spinner = document.querySelector(".spinner");
+        if (spinner) spinner.style.display = "none";
+
         btn.classList.add("enabled");
         btn.disabled = false;
+      } else {
+        timerEl.textContent = countdown;
       }
     }, 1000);
   }
@@ -98,7 +99,7 @@
     const isAndroid = /Android/i.test(ua);
 
     if (isAndroid) {
-      // Force external browser (Chrome)
+      // Force external browser (Chrome) using intent://
       const cleanUrl = nextPage.replace(/^https?:\/\//, "");
       const intentUrl = `intent://${cleanUrl}/#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(nextPage)};end`;
       window.location.href = intentUrl;
@@ -108,20 +109,20 @@
     }
   }
 
-  window.onload = startCountdown;
+  window.addEventListener("load", startCountdown);
 </script>
 </head>
 <body>
   <h1>Please wait for the timer!</h1>
-  <p>Wait <span id="timer">5</span> seconds to continue.</p>
+  <p>You will be able to continue shortly.</p>
 
-  <!-- Spinner with countdown -->
+  <!-- Spinner with single countdown element -->
   <div class="spinner">
     <div class="ring"></div>
     <div class="count" id="timer">5</div>
   </div>
 
-  <!-- Button appears after countdown -->
+  <!-- Button appears after countdown finishes -->
   <button id="openBtn" disabled onclick="openExternal()">Click Here to Watch</button>
 
   <p style="margin-top:20px;font-size:14px;color:#ff5252;">
